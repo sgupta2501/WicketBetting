@@ -1,10 +1,164 @@
-import time
-#start_time = time.time()
 import pandas as pd
 import numpy as np
+import csv  
+    
+data = pd.read_csv('ballByballDataCleaned.csv')
 
+def order_running():
+    
+    #read_orig_file()
+    #update_label_data_file()
+    update_last_next_wicket_over()
+    update_tot_wickets_upto_over()
+    #batsman_over_got_out()
+    #batsman_runs_obtained()
+    #bowler_wickets_taken()
+    
+def update_tot_wickets_upto_over():
+    
+    #data = pd.read_csv('ballByballDataCleaned.csv')
+    match_id = data["match_id"].unique()
+    for k in match_id:
+    #for k in range (1,2):
+        for inning in range(1,3):
+            tot_wicket_upto_this_over=0
+            for over in range(1,21):
+                Wicket_in_this_over=data[(data["match_id"]== k) & (data["inning"]== inning) & (data["over"] == over)]['Wicket_in_this_over']
+                tot_wicket_upto_this_over += sum(Wicket_in_this_over)
+                data.loc[(data["match_id"]== k) & (data["inning"]== inning) & (data["over"]== over), ('tot_wicket_upto_this_over')] = tot_wicket_upto_this_over                    
+
+    data.to_csv("ballByballDataCleaned.csv", index=False)
+
+def batsman_over_got_out():
+
+    #data = pd.read_csv('ballByballDataCleaned.csv')
+    batsman = data["batsman"].unique()
+    match_id = data["match_id"].unique()
+    df=pd.DataFrame()
+    for k in range(0, len(batsman)):
+    #for k in range(0, 1):
+        print(batsman[k])
+        matches=data[(data["batsman"]== batsman[k])]["match_id"].unique()
+        NoOfMatches= len(matches)
+        
+        over_where_out=data[(data["batsman"]== batsman[k]) & (data["Wicket_in_this_over"] == 1)]['over'].unique()
+        match_where_out=data[(data["batsman"]== batsman[k]) & (data["Wicket_in_this_over"] == 1)]['match_id'].unique()
+        No_of_NotOut_Match=NoOfMatches - len(match_where_out)
+           
+        no_of_out_per_over=[0]*20
+        for j in over_where_out:         
+            tmp = data[(data["batsman"]== batsman[k]) & (data["Wicket_in_this_over"] == 1) & (data['over'] == j)]['match_id']
+            #print(j)
+            no_of_out_per_over[j-1]=len(tmp)
+
+        #print(no_of_out_per_over)
+        new_row={"batsman":batsman[k],"Tot_Match_Played":NoOfMatches,"Tot_Match_NotOut":No_of_NotOut_Match,"out_over_1":no_of_out_per_over[0],"out_over_2":no_of_out_per_over[1],"out_over_3":no_of_out_per_over[2],"out_over_4":no_of_out_per_over[3],"out_over_5":no_of_out_per_over[4],"out_over_6":no_of_out_per_over[5],"out_over_7":no_of_out_per_over[6],"out_over_8":no_of_out_per_over[7],"out_over_9":no_of_out_per_over[8],"out_over_10":no_of_out_per_over[9],"out_over_11":no_of_out_per_over[10],"out_over_12":no_of_out_per_over[11],"out_over_13":no_of_out_per_over[12],"out_over_14":no_of_out_per_over[13],"out_over_15":no_of_out_per_over[14],"out_over_16":no_of_out_per_over[15],"out_over_17":no_of_out_per_over[16],"out_over_18":no_of_out_per_over[17],"out_over_19":no_of_out_per_over[18],"out_over_20":no_of_out_per_over[19]}
+        df = df.append(new_row, ignore_index=True)
+        
+    df.to_csv("Batsman_OutPerOver.csv",index=False)
+
+def batsman_runs_obtained():
+    
+    
+    #data = pd.read_csv('ballByballDataCleaned.csv')
+    batsman = data["batsman"].unique()
+    match_id = data["match_id"].unique()
+    df=pd.DataFrame()
+    for k in range(0, len(batsman)):
+    #for k in range(0, 1):
+        print(batsman[k])
+        matches=data[(data["batsman"]== batsman[k])]["match_id"].unique()
+        NoOfMatches= len(matches)
+                 
+        run_per_over=[0]*20
+        for j in range(0, 20):
+            tmp = data[(data["batsman"]== batsman[k]) & (data['over'] == j)]['total_runs']
+            #print(tmp)
+            run_per_over[j-1]=sum(tmp)
+
+        tot_runs = sum(run_per_over)
+        #print(run_per_over)
+        #print(tot_runs)
+        #print(NoOfMatches)
+        new_row={"batsman":batsman[k],"Tot_Match_Played":NoOfMatches,"Tot_Runs":tot_runs,"run_Over_1":run_per_over[0],"run_Over_2":run_per_over[1],"run_Over_3":run_per_over[2],"run_Over_4":run_per_over[3],"run_Over_5":run_per_over[4],"run_Over_6":run_per_over[5],"run_Over_7":run_per_over[6],"run_Over_8":run_per_over[7],"run_Over_9":run_per_over[8],"run_Over_10":run_per_over[9],"run_Over_11":run_per_over[10],"run_Over_12":run_per_over[11],"run_Over_13":run_per_over[12],"run_Over_14":run_per_over[13],"run_Over_15":run_per_over[14],"run_Over_16":run_per_over[15],"run_Over_17":run_per_over[16],"run_Over_18":run_per_over[17],"run_Over_19":run_per_over[18],"run_Over_20":run_per_over[19]}
+
+        df = df.append(new_row, ignore_index=True)
+        
+    df.to_csv("Batsman_RunPerOver.csv",index=False)
+
+def bowler_wickets_taken():
+    
+    #data = pd.read_csv('ballByballDataCleaned.csv')
+    # field names  
+    fields = ["bowler","Tot_Match_Played","Tot_Wickets","Tot_Dud_Match_Played","Wicket_Over_1","Wicket_Over_2","Wicket_Over_3","Wicket_Over_4","Wicket_Over_5","Wicket_Over_6","Wicket_Over_7","Wicket_Over_8","Wicket_Over_9","Wicket_Over_10","Wicket_Over_11","Wicket_Over_12","Wicket_Over_13","Wicket_Over_14","Wicket_Over_15","Wicket_Over_16","Wicket_Over_17","Wicket_Over_18","Wicket_Over_19","Wicket_Over_20"]
+
+    # name of csv file  
+    filename = "Bowler_WicketsPerOver.csv"
+    bowler = data["bowler"].unique()
+    match_id = data["match_id"].unique()
+
+    # writing to csv file  
+    with open(filename, 'w') as csvfile:  
+        # creating a csv writer object  
+        csvwriter = csv.writer(csvfile)  
+
+        # writing the fields  
+        csvwriter.writerow(fields)  
+   
+        for k in range(0, len(bowler)):
+        #for k in range(0, 2):
+            #print(bowler[k])
+            matches=data[(data["bowler"]== bowler[k])]["match_id"].unique()
+            NoOfMatches= len(matches)
+
+            over_with_wicket=data[(data["bowler"]== bowler[k]) & (data["Wicket_in_this_over"] == 1)]['over'].unique()
+            match_with_wicket=data[(data["bowler"]== bowler[k]) & (data["Wicket_in_this_over"] == 1)]['match_id'].unique()
+            No_of_Dud_Match=NoOfMatches - len(match_with_wicket)
+
+            wicket_per_over=[0]*20
+            for j in over_with_wicket:         
+                tmp = data[(data["bowler"]== bowler[k]) & (data["Wicket_in_this_over"] == 1) & (data['over'] == j)]['match_id']
+                #print(j)
+                wicket_per_over[j-1]=len(tmp)
+
+            tot_wickets = sum(wicket_per_over)
+            row = [bowler[k],NoOfMatches,tot_wickets,No_of_Dud_Match,wicket_per_over[0],wicket_per_over[1],wicket_per_over[2],wicket_per_over[3],wicket_per_over[4],wicket_per_over[5],wicket_per_over[6],wicket_per_over[7],wicket_per_over[8],wicket_per_over[9],wicket_per_over[10],wicket_per_over[11],wicket_per_over[12],wicket_per_over[13],wicket_per_over[14],wicket_per_over[15],wicket_per_over[16],wicket_per_over[17],wicket_per_over[18],wicket_per_over[19]]
+
+            # writing the data rows  
+            csvwriter.writerow(row)     
+            
+    '''
+    bowler = data["bowler"].unique()
+    match_id = data["match_id"].unique()
+    
+    df=pd.DataFrame()
+    for k in range(0, len(bowler)):
+    #for k in range(0, 2):
+        print(bowler[k])
+        matches=data[(data["bowler"]== bowler[k])]["match_id"].unique()
+        NoOfMatches= len(matches)
+        
+        over_with_wicket=data[(data["bowler"]== bowler[k]) & (data["Wicket_in_this_over"] == 1)]['over'].unique()
+        match_with_wicket=data[(data["bowler"]== bowler[k]) & (data["Wicket_in_this_over"] == 1)]['match_id'].unique()
+        No_of_Dud_Match=NoOfMatches - len(match_with_wicket)
+           
+        wicket_per_over=[0]*20
+        for j in over_with_wicket:         
+            tmp = data[(data["bowler"]== bowler[k]) & (data["Wicket_in_this_over"] == 1) & (data['over'] == j)]['match_id']
+            #print(j)
+            wicket_per_over[j-1]=len(tmp)
+
+        tot_wickets = sum(wicket_per_over)
+        new_row={"bowler":bowler[k],"Tot_Match_Played":NoOfMatches,"Tot_Wickets":tot_wickets,"Tot_Dud_Match_Played":No_of_Dud_Match,"Wicket_Over_1":wicket_per_over[0],"Wicket_Over_2":wicket_per_over[1],"Wicket_Over_3":wicket_per_over[2],"Wicket_Over_4":wicket_per_over[3],"Wicket_Over_5":wicket_per_over[4],"Wicket_Over_6":wicket_per_over[5],"Wicket_Over_7":wicket_per_over[6],"Wicket_Over_8":wicket_per_over[7],"Wicket_Over_9":wicket_per_over[8],"Wicket_Over_10":wicket_per_over[9],"Wicket_Over_11":wicket_per_over[10],"Wicket_Over_12":wicket_per_over[11],"Wicket_Over_13":wicket_per_over[12],"Wicket_Over_14":wicket_per_over[13],"Wicket_Over_15":wicket_per_over[14],"Wicket_Over_16":wicket_per_over[15],"Wicket_Over_17":wicket_per_over[16],"Wicket_Over_18":wicket_per_over[17],"Wicket_Over_19":wicket_per_over[18],"Wicket_Over_20":wicket_per_over[19]}
+
+        df = df.append(new_row, ignore_index=True)
+        
+    df.to_csv("Bowler_WicketsPerOver.csv",index=False)
+                     
+    '''
+    
 def read_orig_file():
-    data = pd.read_csv('ballByballDataCleaned.csv')
+    #data = pd.read_csv('ballByballDataCleaned.csv')
     ## Get all the players, batsman, bowlers
     allBatsman = data["batsman"].unique()
     allBowler = data["bowler"].unique()
@@ -18,7 +172,7 @@ def read_orig_file():
     df.to_csv("ListAllPlayer.csv",index=False)
 
 def update_label_data_file():
-    data = pd.read_csv('ballByballDataCleaned.csv')
+    #data = pd.read_csv('ballByballDataCleaned.csv')
     #print("in update_data_file")
     #player_dismissed,Wicket_in_this_over
     player_dismissed = data["player_dismissed"]
@@ -32,7 +186,7 @@ def update_last_next_wicket_over():
     
     match_id = data["match_id"].unique()
     for k in match_id:
-        for inning in range(1,2):
+        for inning in range(1,3):
             over_wicket_taken=data[(data["match_id"]== k) & (data["inning"]== inning) & (data["Wicket_in_this_over"] == 1)]['over']
             over_wicket_taken=over_wicket_taken.unique()
             
@@ -53,217 +207,39 @@ def update_last_next_wicket_over():
       
     data.to_csv("ballByballDataCleaned.csv", index=False)
 
-    '''
-    over_wicket_taken=data[(data["match_id"]== 1) & (data["inning"]== 1) & (data["Wicket_in_this_over"] == 1)]['over']
-    over_wicket_taken=over_wicket_taken.unique()
-            
-    start_over=1
-    start_over1=1
-    Over_of_last_wicket=0
-
-    for j in range(0, len(over_wicket_taken)):
-        print("over", "over last wicket")
-        for i in range(start_over, over_wicket_taken[j]+1):
-            print(i, Over_of_last_wicket)
-        start_over=over_wicket_taken[j]+1
-        Over_of_last_wicket=over_wicket_taken[j]
-            
-        Over_of_next_wicket=over_wicket_taken[j]         
-        print("over", "Over_of_next_wicket")
-        for i in range(start_over1, over_wicket_taken[j]):
-            print(i, Over_of_next_wicket)
-        start_over1=over_wicket_taken[j]
-    '''
+def update_next_4_over_wicket_taken():
+    data = pd.read_csv('ballByballDataCleaned.csv')
     
-    
-def other_work():
-    # Runs scored by a player
-    Sr_No = 1
-    #for k in range(Sr_No ,len(allBatsman)):
-    for k in range(Sr_No ,10):
-        PlayerName = allBatsman[k]
-        pd.DataFrame({"Last_batsman":PlayerName, "Sr_No":k},index=range(0,1)).to_csv("Lastp.csv",index=False)
-        print (PlayerName,k)
-
-        ldf = pd.DataFrame()
-        Match_id = []
-        Name = []
-        Runs = []; 	# No. of runs scored by a batsman in a match
-        boPld = []  # No. of balls played by a batsman in a match
-        chauke =[] 	# No. of fours a batsman hit in a match
-        chhakke = []  # No. of sixes
-        catches = []
-        runout = []  # How many runouts a player have got
-        strkrate = []  # Strike rate of a batsman in a match
-
-        lwide_runs=[]
-        lbye_runs=[]
-        llegbye_runs=[]
-        lnoball_runs=[]
-        lpenalty_runs=[]
-        lextra_runs	=[]
-        ltotal_runs=[]
-        lovers = []
-        lwicket = []
-        leco_rate = [] 
-        lasBataman = []
-        lasBowler = []
-        lasFielder = []
-        d11sc = []
-
-        for mid in range(1,637):
-            print ("Player Choosen: ", PlayerName)
-            # PlayerName = input("\nEnter the name of the player ")
-            print ("Wait...We are generating player's stats for match", mid)
-
-            ## Batting score
-            ballsPlayed = data[(data["batsman"]== PlayerName) &(data['match_id']==mid)]["batsman_runs"].count()
-            if ballsPlayed == 0:
-                continue
-            RunPlayer = data[(data["batsman"]== PlayerName) &(data['match_id']==mid)]["batsman_runs"].sum()
-            SR = RunPlayer/ballsPlayed
-            Four_byPlayer = data[(data["batsman"]== PlayerName)& (data['match_id']==mid) & (data["batsman_runs"]== 4)]["batsman_runs"].count()
-            Six_byPlayer = data[(data["batsman"]== PlayerName)& (data['match_id']==mid) & (data["batsman_runs"]== 6)]["batsman_runs"].count()
-
-            if RunPlayer >= 100:
-                bonusScore = 8
-            elif RunPlayer >=50:
-                bonusScore = 4
-            else:
-                bonusScore = 0
-
-            if SR <= 0.5:
-                penaltyScore = -3
-            elif SR > 0.5 and SR <=0.599:
-                penaltyScore = -2
-            elif SR>=0.6 and SR <= 0.7:
-                penaltyScore = -1
-            else:
-                penaltyScore = 0
-
-
-            ## Fielding Score
-            cfieldScore = data[(data["fielder"]==PlayerName) & (data['match_id']==mid) & (data["dismissal_kind"]=="caught")]['dismissal_kind'].count()
-            rfieldScore = data[(data["fielder"]==PlayerName) & (data['match_id']==mid) & (data["dismissal_kind"]=="run out")]['dismissal_kind'].count()
-            fieldScore = cfieldScore*4+rfieldScore*4
-
-
-            ## Bowling score
-            bfieldScore = data[(data["bowler"]==PlayerName) &(data['match_id']==mid) &(data["dismissal_kind"]=="bowled")]['dismissal_kind'].count()
-
-            overs = len(data[(data["bowler"]== PlayerName) &(data['match_id']==mid)]["over"].unique())
-            wicket = data[(data["bowler"]== PlayerName) &(data['match_id']==mid)]["player_dismissed"].count()
-
-            wide_runs = data[(data["bowler"]== PlayerName) &(data['match_id']==mid)]["wide_runs"].sum()
-            bye_runs =  data[(data["bowler"]== PlayerName) &(data['match_id']==mid)]["bye_runs"].sum()
-            legbye_runs = data[(data["bowler"]== PlayerName) &(data['match_id']==mid)]["legbye_runs"].sum()
-            noball_runs = data[(data["bowler"]== PlayerName) &(data['match_id']==mid)]["noball_runs"].sum()
-            penalty_runs = data[(data["bowler"]== PlayerName) &(data['match_id']==mid)]["penalty_runs"].sum()
-            extra_runs = data[(data["bowler"]== PlayerName) &(data['match_id']==mid)]["extra_runs"].sum()
-            total_runs = data[(data["bowler"]== PlayerName) &(data['match_id']==mid)]["total_runs"].sum()
-
-
-            if overs == 0:
-                eco_rate = 0
-                bpenaltyScore = 0
-            else:
-                eco_rate = total_runs/(overs)
-                if eco_rate <= 4:
-                    bpenaltyScore = 3
-                elif eco_rate > 4 and eco_rate <= 5:
-                    bpenaltyScore = 2
-                elif eco_rate>=5 and eco_rate <= 6:
-                    bpenaltyScore = 1
-                elif eco_rate>=9 and eco_rate <= 10:
-                    bpenaltyScore = -1
-                elif eco_rate>=10 and eco_rate <= 11:
-                    bpenaltyScore = -2
-                elif eco_rate>=11:
-                    bpenaltyScore = -3
+    match_id = data["match_id"].unique()
+    for k in match_id:
+        for inning in range(1,3):
+            over_wicket_taken=data[(data["match_id"]== k) & (data["inning"]== inning) & (data["Wicket_in_this_over"] == 1)]['over']
+            over_wicket_taken=over_wicket_taken.unique()
+            
+            for j in range(0, 13):
+                if (j+1) in over_wicket_taken:
+                    wicket_in_over_1=1
                 else:
-                    bpenaltyScore = 0
+                    wicket_in_over_1=0
+                data.loc[(data["match_id"]== k) & (data["inning"]== inning) & (data["over"]== j), ('wicket_in_over_1')] = wicket_in_over_1
+                
+                if (j+2) in over_wicket_taken:
+                    wicket_in_over_2=1
+                else:
+                    wicket_in_over_2=0  
+                data.loc[(data["match_id"]== k) & (data["inning"]== inning) & (data["over"]== j), ('wicket_in_over_2')] = wicket_in_over_2
 
+                if (j+3) in over_wicket_taken:
+                    wicket_in_over_3=1
+                else:
+                    wicket_in_over_3=0
+                data.loc[(data["match_id"]== k) & (data["inning"]== inning) & (data["over"]== j), ('wicket_in_over_3')] = wicket_in_over_3      
 
-            if wicket == 4:
-                sc_score = 4
-            elif wicket > 4:
-                sc_score = 5	
-            else:
-                sc_score = 0
-
-            asBataman = RunPlayer*0.5+Four_byPlayer*0.5+Six_byPlayer+bonusScore+penaltyScore
-            asBowler = wicket*10 + bpenaltyScore + sc_score 
-            asFielder = fieldScore
-            ## Dream 11 score
-            dr11Score = asBataman + asBowler + asFielder 
-            print ("batsman:",PlayerName,"Runs",RunPlayer,"Balls played" ,ballsPlayed,"4s",Four_byPlayer, "6s",Six_byPlayer,"Strike Rate",SR,"\nDream11 Score", dr11Score)
-
-
-        # Appending all the data to lists to finally give it to panda and write on csv/excel file
-            Match_id.append(mid)
-            Name.append(PlayerName)
-            Runs.append(RunPlayer)
-            boPld.append(ballsPlayed)
-            chauke.append(Four_byPlayer) 
-            chhakke.append(Six_byPlayer)
-            strkrate.append((int(SR*100)))
-            catches.append(cfieldScore) 
-            runout.append(rfieldScore)
-
-            lovers.append(overs)
-            lwicket.append(wicket)
-            leco_rate.append(eco_rate)
-            lwide_runs.append(wide_runs)
-            lbye_runs.append(bye_runs)
-            llegbye_runs.append(legbye_runs)
-            lnoball_runs.append(noball_runs)
-            lpenalty_runs.append(penalty_runs)
-            lextra_runs	.append(extra_runs)
-            ltotal_runs.append(total_runs)
-
-            lasBataman.append(asBataman)
-            lasBowler.append(asBowler)
-            lasFielder.append(asFielder)
-            d11sc.append(dr11Score)
-
-
-
-        ldf["Sr_No"] = [i for i in range(len(Name))]
-        ldf["MatchID"] = Match_id
-        ldf["Name"] = Name
-        ldf["Runs"] = Runs
-        ldf["Balls"] = boPld
-        ldf["4s"] = chauke
-        ldf["6s"] = chhakke
-        ldf["Strike_Rate"] = strkrate
-        ldf["Catches"] = catches
-        ldf["Run_Out"] = runout
-
-        ldf["over"] = lovers
-        ldf["total_runs"] = ltotal_runs
-        ldf["wicket"] = lwicket
-        ldf["economy"] = leco_rate
-        ldf["wide_runs"] = lwide_runs
-        ldf["bye_runs"] = lbye_runs
-        ldf["legbye_runs"] = llegbye_runs
-        ldf["noball_runs"] = lnoball_runs
-        ldf["penalty_runs"] = lpenalty_runs
-        ldf["extra_runs"] = lextra_runs
-
-        ldf["asBataman"] = lasBataman
-        ldf["asBowler"] = lasBowler
-        ldf["asFielder"] = lasFielder
-
-        ldf["Dream11Score"] = d11sc
-
-
-        ldf.to_csv("Player_Scores\\{}.csv".format(PlayerName),index=False)
-    '''
-        print ("===========================================================================")
-        print ("Time taken in the process", time.time()-start_time)
-        print ("===========================================================================")
-
-    '''
-
-
+                if (j+4) in over_wicket_taken:
+                    wicket_in_over_4=1
+                else:
+                    wicket_in_over_4=0
+                data.loc[(data["match_id"]== k) & (data["inning"]== inning) & (data["over"]== j), ('wicket_in_over_4')] = wicket_in_over_4                
+                
+    data.to_csv("ballByballDataCleaned.csv", index=False)
 
