@@ -5,7 +5,7 @@ hackthon 2019-20- wicket betting
  
 To install dependencies, run the following command
 
-pip install -r requitements.txt
+pip install -r requirements.txt
 
 Then, run the following command: python predict.py
 
