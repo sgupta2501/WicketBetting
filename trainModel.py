@@ -1,6 +1,6 @@
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import csv  
 from sklearn.metrics import confusion_matrix
 from sklearn.model_selection import train_test_split
@@ -57,7 +57,7 @@ def train_data_mlp(x,y,filename):
     
     #Multi layer pereptron
     from sklearn.neural_network import MLPClassifier
-    clf = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(5, 2), random_state=1)
+    clf = MLPClassifier(solver='lbfgs', alpha=1e-5, hidden_layer_sizes=(5, 2), random_state=1, max_iter=1000)
     clf.fit(x_train, y_train)
     ypred = clf.predict(x_test)
     # Calculate the absolute errors
@@ -112,7 +112,7 @@ def call_train(filename,col1,col2,col3,col4,label,modelfilename1,modelfilename2)
     x_1= data_upsampled.iloc[:,[p1_idx,p21_idx,p31_idx,p41_idx]].values
     y= data_upsampled.iloc[:,y_idx].values
     
-    train_data_logreg(x_1,y,modelfilename1)
+    #train_data_logreg(x_1,y,modelfilename1)
     train_data_mlp(x_1,y,modelfilename2)      
     
 
@@ -127,3 +127,4 @@ def main():
     call_train('yx_4.csv',"p1","p24","p34","p44","y",'finalized_model_logreg_4.sav','finalized_model_mlp_4.sav')
 
     
+main()
