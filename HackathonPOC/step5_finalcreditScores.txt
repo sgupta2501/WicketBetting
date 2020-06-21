@@ -1,0 +1,23 @@
+kock 9.5 wk 
+parthiv 8.5 wk 
+kohli 11.0 batsman 
+r_sharma 10.5 batsman 
+de_villiers 10.0 batsman 
+s_yadav 9.0 batsman 
+Y_singh 8.5 batsman 
+h_pandya 9.5 AR 
+M_Ali 8.5 ar 
+bumrah 9.5 bowl
+chahal 9.0 bowl 
+siraj 8.5 bowl 
+hetmyer 8.5 batsman
+shivam_dube 8.0 ar
+grandhomme 8.5 ar
+saini 8.0 bowl
+umesh_yadav 9.0 bowl
+pollard 8.5 batsman
+k_pandya 8.5 ar
+mcclenaghan 8.5 bowl
+malinga 8.5 bowl
+markande 8.0 bowl
+
